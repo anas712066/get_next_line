@@ -25,18 +25,28 @@ static char	*append_buffer(char *buffer, char *temp, ssize_t bytes_read)
 
 static char	*read_until_newline(int fd, char *buffer)
 {
-	char	temp[BUFFER_SIZE + 1];
+	char	*temp;
 	ssize_t	bytes_read;
 
+	temp = (char *) malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!temp)
+		return (NULL);
 	while (!ft_strchr(buffer, '\n'))
 	{
 		bytes_read = read(fd, temp, BUFFER_SIZE);
 		if (bytes_read <= 0)
+		{
+			free(temp);
 			return (buffer);
+		}
 		buffer = append_buffer(buffer, temp, bytes_read);
 		if (!buffer)
+		{
+			free(temp);
 			return (NULL);
+		}
 	}
+	free(temp);
 	return (buffer);
 }
 
@@ -65,7 +75,7 @@ char	*get_next_line(int fd)
 {
 	static char	*buffer;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || BUFFER_SIZE >= 2147473647)
 		return (NULL);
 	if (!buffer)
 	{
